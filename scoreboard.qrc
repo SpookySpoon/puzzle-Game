@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>MyPuzzleScore.txt</file>
+    </qresource>
+</RCC>
