@@ -1,5 +1,6 @@
-#include "puzzleform.h"
 #include <QApplication>
+#include "puzzleform.h"
+
 
 int main(int argc, char *argv[])
 {

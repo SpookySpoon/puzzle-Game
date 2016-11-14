@@ -1,10 +1,10 @@
-#include "congratswindow.h"
-#include <ui_congratswindow.h>
-#include <scoremanager.h>
 #include <QDateTime>
-#include <puzzleform.h>
+#include "congratswindow.h"
+#include "ui_congratswindow.h"
+#include "scoremanager.h"
 
-CongratsWindow::CongratsWindow(QWidget *parent, int moves ,  int time, PuzzleForm* buddy, bool countScore) :
+
+CongratsWindow::CongratsWindow(const int moves, const int time, PuzzleForm* buddy, const bool countScore, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CongratsWindow),buddy(buddy)
 {
@@ -26,7 +26,7 @@ CongratsWindow::~CongratsWindow()
     delete ui;
 }
 
-void CongratsWindow::initLables(const int& moves ,  const int& time)
+void CongratsWindow::initLables(const int moves, const int time)
 {
     QList<int> lableData=scoreManager::getScore();
     ui->lableCurScoreMoves->setText(QString("Number of moves: %1").arg(moves));
@@ -57,14 +57,13 @@ void CongratsWindow::initNoScoreLables()
 void CongratsWindow::on_buttonQuit_clicked()
 {
     buddy->close();
-    this->close();
+    close();
 }
 
 void CongratsWindow::on_buttonTryAgain_clicked()
 {
-    buddy->startOver();
-    buddy->reset();
-    this->close();
+    buddy->sameGameAgain();
+    close();
 }
 
 void CongratsWindow::on_buttonResetHistory_clicked()
@@ -76,6 +75,6 @@ void CongratsWindow::on_buttonResetHistory_clicked()
 void CongratsWindow::on_buttonNewGame_clicked()
 {
     buddy->newGame();
-    this->close();
+    close();
 
 }

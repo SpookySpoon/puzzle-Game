@@ -1,20 +1,20 @@
-#include <qmessagebox.h>
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
 #include "scoremanager.h"
-#include <qfile.h>
-#include <qtextstream.h>
-#include <qstring.h>
-scoreManager::scoreManager(){}
-scoreManager::~scoreManager(){}
+
 
 QList<int> scoreManager::getScore()
 {
     QList<int> results;
     QFile tempFile("MyPuzzleScore.txt");
     QString raw="";
-    tempFile.open(QIODevice::ReadOnly);
-    QTextStream txtMngr (&tempFile);
-    raw = txtMngr.readLine();
-    tempFile.close();
+    if(tempFile.open(QIODevice::ReadOnly))
+    {
+        QTextStream txtMngr (&tempFile);
+        raw = txtMngr.readLine();
+        tempFile.close();
+    }
     QStringList cutRaw = raw.split("[::]",QString::SkipEmptyParts);
     if(cutRaw.count()<5||raw=="")
     {
@@ -30,7 +30,7 @@ QList<int> scoreManager::getScore()
     return results;
 }
 
-void scoreManager::updateScore(int& time, int& moves)
+void scoreManager::updateScore(const int time, const int moves)
 {
     QList<int> currentRecords=scoreManager::getScore();
     int bestTime, bestScore, bestTimeComb, bestScoreComb, gamesPlayed;
@@ -67,18 +67,22 @@ void scoreManager::updateScore(int& time, int& moves)
     QString sendResults =QString("%1[::]%2[::]%3[::]%4[::]%5").
             arg(bestTime).arg(bestScore).arg(bestTimeComb).arg(bestScoreComb).arg(gamesPlayed);
     QFile tempFile("MyPuzzleScore.txt");
-    tempFile.open(QIODevice::Truncate|QIODevice::WriteOnly);
-    QTextStream outStream(&tempFile);
-    outStream<<sendResults<<endl;
-    tempFile.close();
+    if(tempFile.open(QIODevice::Truncate|QIODevice::WriteOnly))
+    {
+        QTextStream outStream(&tempFile);
+        outStream<<sendResults<<endl;
+        tempFile.close();
+    }
+    else
+    {
+        QMessageBox noScoreBox;
+        noScoreBox.setText("No score table was created.\nCheck your folder access parameters.");
+        noScoreBox.exec();
+    }
 }
 
 void scoreManager::resetScore()
 {
-    QString sendResults="";
     QFile tempFile("MyPuzzleScore.txt");
-    tempFile.open(QIODevice::Truncate|QIODevice::WriteOnly);
-    QTextStream outStream(&tempFile);
-    outStream<<sendResults<<endl;
-    tempFile.close();
+    tempFile.remove();
 }

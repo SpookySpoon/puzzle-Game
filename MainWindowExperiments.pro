@@ -21,8 +21,7 @@ HEADERS  += \
     congratswindow.h\
     scoremanager.h \
     puzzleform.h \
-    ../build-MainWindowExperiments-Desktop_Qt_5_7_0_MSVC2015_64bit-Debug/ui_puzzleform.h \
-    ../build-MainWindowExperiments-Desktop_Qt_5_7_0_MSVC2015_64bit-Debug/ui_congratswindow.h
+    ../build-MainWindowExperiments-Desktop_Qt_5_7_0_MSVC2015_64bit-Debug/ui_puzzleform.h
 
 
 FORMS    += \

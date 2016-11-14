@@ -1,15 +1,10 @@
-#ifndef SCOREMANAGER_H
-#define SCOREMANAGER_H
-#include <qstring.h>
+#pragma once
+#include <QList>
 
 class scoreManager
 {
 public:
-    scoreManager();
-    ~scoreManager();
-    static void updateScore(int& time, int& moves);
+    static void updateScore(const int time, const int moves);
     static QList<int> getScore();
     static void resetScore();
 };
-
-#endif // SCOREMANAGER_H

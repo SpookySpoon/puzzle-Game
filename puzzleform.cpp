@@ -1,31 +1,34 @@
+#include <QDateTime>
+#include "stdio.h"
+#include "stdlib.h"
+#include "time.h"
 #include "puzzleform.h"
 #include "ui_puzzleform.h"
-#include <QMessageBox>
-#include <qtextstream.h>
-#include <qstring.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <QPushButton>
-#include <QTime>
-#include <scoremanager.h>
-#include <congratswindow.h>
+#include "scoremanager.h"
+#include "congratswindow.h"
+
+
+
+
 
 PuzzleForm::PuzzleForm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::PuzzleForm)
+    QWidget(parent),ui(new Ui::PuzzleForm),numberOfMoves(0),elapsedSeconds(0), countScore(true)
 {
     ui->setupUi(this);
+    //В цикле ниже перебираются все кнопки пазла, включенные в gridLayout.
+    //Они одновременно добавляются как ссылки в список кнопок "puzzlePieces",
+    //а также от каждой кнопки берется сигнал, который будет запускать функцию "on_pushButton(bool mark=false)".
+    //Потом просто при нажатии кнопки функция получит имя кнопки, найдет её в сетке пазла и применит к ней функцию поиска пустой ячейки "findVacant".
+    //В этой функции я добавил булевый аргумент, потому что мне Qt не давал связать слот и сигнал с разными аргументами
+    //Так что по сути аргумент слота это просто аппендикс.
      for(int i =0;i<ui->gridLayout->count();i++)
      {
         PuzzleForm::puzzlePieces<<qobject_cast<QPushButton*>(ui->gridLayout->itemAt(i)->widget());
         connect(ui->gridLayout->itemAt(i)->widget(), SIGNAL(clicked(bool)), this, SLOT(on_pushButton(bool)));
         buttonInitialOrder<<(i);
      }
-     PuzzleForm::numberOfMoves=0;
-     PuzzleForm::elapsedSeconds=0;
-     PuzzleForm::timer.start(1000,this);
-     this->on_buttonShuffle_clicked();
+     //Эта функция (по совместительству слот) перемешивает кнопки случайным образом и запускает таймер для подсчета времени на партию.
+     on_buttonShuffle_clicked();
 }
 
 PuzzleForm::~PuzzleForm()
@@ -105,6 +108,11 @@ void PuzzleForm::newGame()
     on_buttonShuffle_clicked();
 }
 
+void PuzzleForm::sameGameAgain()
+{
+    startOver();
+    reset();
+}
 
 void PuzzleForm::checkResult()
 {
@@ -137,7 +145,7 @@ void PuzzleForm::checkResult()
         {
             timer.stop();
         }
-        CongratsWindow* conWindow=new CongratsWindow(0,numberOfMoves,elapsedSeconds,this, countScore);
+        CongratsWindow* conWindow=new CongratsWindow(numberOfMoves,elapsedSeconds,this, countScore, 0);
         conWindow->exec();
     }
 }
@@ -153,28 +161,18 @@ void PuzzleForm::timerEvent(QTimerEvent* event)
 
 void PuzzleForm::on_buttonQuit_clicked()
 {
-    this->close();
+    close();
 }
 
 void PuzzleForm::on_buttonRestart_clicked()
 {
-    startOver();
-    reset();
+    sameGameAgain();
 }
 
 void PuzzleForm::on_pushButton(bool mark1)
 {
-    QString name = sender()->objectName();
-    for (int i1=0;i1<ui->gridLayout->count();i1++)
-    {
-        QWidget* tempWidget = ui->gridLayout->itemAt(i1)->widget();
-        if(tempWidget->objectName()==name)
-        {
-            PuzzleForm::findVacant(tempWidget,ui->gridLayout);
-            checkResult();
-            break;
-        }
-    }
+    PuzzleForm::findVacant(qobject_cast<QWidget*>(sender()),ui->gridLayout);
+    checkResult();
 }
 
 void PuzzleForm::on_buttonShuffle_clicked()
